@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manager/Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F7F9FC;
+    }
+
+    /* Styling for the active navigation link */
+    .active-link {
+      background-color: #3730A3;
+      /* Indigo-800 Darker for hover/active */
+      color: white;
+      font-weight: 600;
+    }
+
+    /* Ensure main content starts after the sidebar width */
+    .main-content {
+      margin-left: 16rem;
+      /* Tailwind w-64 */
+    }
+
+    /* Modal specific styles */
+    .modal-overlay {
+      background-color: rgba(0, 0, 0, 0.75);
+    }
+
+    /* SCROLL FIX: Scrollable form content area */
+    .modal-content-scroll {
+      max-height: 70vh;
+      /* Limits max height to 70% of viewport height */
+      overflow-y: auto;
+      /* Enables vertical scrolling */
+      padding-right: 1rem;
+      /* Adds space for the scrollbar */
+    }
+  </style>
+</head>
+
+<body class="flex min-h-screen">
+  <div id="app-container" class="w-full flex">
+
+    <aside class="w-64 bg-indigo-700 text-white flex flex-col fixed h-full z-10 shadow-2xl">
+      <div class="p-6 text-2xl font-bold border-b border-indigo-800">
+        Hotel Admin ⚙️
+      </div>
+      <nav id="sidebar-nav" class="flex-grow p-4 space-y-2">
+        <a href="#" data-view="staff-management"
+          class="nav-link flex items-center p-3 rounded-lg hover:bg-indigo-600 active-link">
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 20h-1.5a4.5 4.5 0 00-4.5-4.5H9A4.5 4.5 0 004.5 20H3M12 11a4 4 0 100-8 4 4 0 000 8z">
+            </path>
+          </svg>
+          Staff Management
+        </a>
+        <a href="#" data-view="room-type-config" class="nav-link flex items-center p-3 rounded-lg hover:bg-indigo-600">
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m7 0h3M7 7h3m-2 4v6">
+            </path>
+          </svg>
+          Room Type Config
+        </a>
+        <a href="#" data-view="room-inventory" class="nav-link flex items-center p-3 rounded-lg hover:bg-indigo-600">
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14-8h-14"></path>
+          </svg>
+          Room Inventory
+        </a>
+        <a href="#" data-view="services-catalog" class="nav-link flex items-center p-3 rounded-lg hover:bg-indigo-600">
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9.663 17h4.673M12 3v13.5m0 0l-3-3m3 3l3-3"></path>
+          </svg>
+          Services Catalog
+        </a>
+        <!-- NEW NAVIGATION LINK -->
+        <a href="#" data-view="guest-billing" class="nav-link flex items-center p-3 rounded-lg hover:bg-indigo-600">
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3zM21 20h-1.5a4.5 4.5 0 00-4.5-4.5H9A4.5 4.5 0 004.5 20H3M12 14c-4.418 0-8 1.791-8 4v2h16v-2c0-2.209-3.582-4-8-4z">
+            </path>
+          </svg>
+          Guest & Financial Overview
+        </a>
+      </nav>
+
+      <div class="p-4 border-t border-indigo-800">
+        <a href="index.html"
+          class="w-full flex items-center justify-center py-2 px-4 border border-transparent rounded-lg text-lg font-medium text-white bg-red-600 hover:bg-red-700 transition duration-150">
+          Log Out
+        </a>
+      </div>
+    </aside>
+
+    <main class="flex-grow p-8 main-content">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6" id="main-title">Staff Management</h1>
+
+      <div id="status-message" class="hidden p-4 mb-6 rounded-lg text-sm transition-opacity duration-300"></div>
+
+      <div id="views-container">
+
+        <section id="view-staff-management" class="management-view">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold text-gray-700">All Staff Accounts</h2>
+            <button onclick="handleAdd('staff')"
+              class="py-2 px-4 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition">
+              + Add New Staff
+            </button>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    ID</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Username</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Role</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions</th>
+                </tr>
+              </thead>
+              <tbody id="staff-table-body" class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td colspan="5" class="px-6 py-4 text-center text-gray-500">Loading staff data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="view-room-type-config" class="management-view hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold text-gray-700">Room Type Configuration</h2>
+            <button onclick="handleAdd('room-types')"
+              class="py-2 px-4 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition">
+              + Add New Type
+            </button>
+          </div>
+
+          <div id="room-type-list" class="space-y-4">
+            <div class="bg-white p-6 rounded-xl shadow-lg text-center text-gray-500">Loading room types...</div>
+          </div>
+        </section>
+
+        <section id="view-room-inventory" class="management-view hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold text-gray-700">Physical Room Inventory</h2>
+            <button onclick="handleAdd('rooms')"
+              class="py-2 px-4 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition">
+              + Add New Room
+            </button>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Room No.</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type ID</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Floor</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rooms-table-body" class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td colspan="5" class="px-6 py-4 text-center text-gray-500">Loading room inventory...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="view-services-catalog" class="management-view hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold text-gray-700">Services Catalog Management</h2>
+            <button onclick="handleAdd('services')"
+              class="py-2 px-4 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition">
+              + Add New Service
+            </button>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    ID</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Unit Price</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions</th>
+                </tr>
+              </thead>
+              <tbody id="services-table-body" class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td colspan="4" class="px-6 py-4 text-center text-gray-500">Loading services...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- MODIFIED GUEST AND FINANCIAL SECTION: Unified Table -->
+        <section id="view-guest-billing" class="management-view hidden">
+
+
+          <h3 class="text-2xl font-semibold text-gray-700 mb-4">Unified Transaction History (Bill & Payment)</h3>
+
+
+          <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bill ID
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guest Name
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Res ID /
+                    Room #</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Res Status
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bill Total
+                    (₹)</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment
+                    Method</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid Amount
+                    (₹)</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment
+                    Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bill Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="unified-financial-table-body" class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td colspan="9" class="px-6 py-4 text-center text-gray-500">Loading unified financial data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="view-general" class="management-view hidden">
+          <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md" role="alert">
+            <p class="font-bold">Access Warning</p>
+            <p>This section is under construction or reserved for specific administrative reports.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="crud-modal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center transition-opacity modal-overlay">
+    <div class="bg-white p-8 rounded-xl shadow-3xl max-w-lg w-full transform transition-all duration-300">
+      <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Add New Record</h3>
+
+      <form id="crud-form">
+        <input type="hidden" id="form-entity-type" name="entityType">
+        <input type="hidden" id="form-record-id" name="recordID">
+
+        <div id="form-scroll-wrapper" class="modal-content-scroll">
+          <div id="form-fields-container" class="space-y-4 mb-6">
+          </div>
+        </div>
+        <div class="flex justify-end space-x-3 pt-4 border-t mt-4">
+          <button type="button" onclick="closeModal()"
+            class="py-2 px-4 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
+            Cancel
+          </button>
+          <button type="submit" id="modal-submit-btn"
+            class="py-2 px-4 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <script>
+    const BASE_URL = 'https://hotel-management-system-cc5r.onrender.com/api';
+    const HEADERS = { 'Content-Type': 'application/json' };
+    const views = document.querySelectorAll('.management-view');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const mainTitle = document.getElementById('main-title');
+    const statusMessage = document.getElementById('status-message');
+    const crudModal = document.getElementById('crud-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const formFieldsContainer = document.getElementById('form-fields-container');
+    const crudForm = document.getElementById('crud-form');
+    const modalSubmitBtn = document.getElementById('modal-submit-btn');
+
+    // --- Configuration for Dynamic Form Fields ---
+    const ENTITY_CONFIG = {
+      'staff': {
+        idKey: 'staffID',
+        title: 'Staff Member',
+        fields: [
+          { name: 'firstName', label: 'First Name', type: 'text', required: true },
+          { name: 'lastName', label: 'Last Name', type: 'text', required: true },
+          { name: 'email', label: 'Email', type: 'email', required: true },
+          { name: 'username', label: 'Username', type: 'text', required: true },
+          { name: 'role', label: 'Role', type: 'select', options: ['Admin', 'Manager', 'Receptionist', 'Housekeeping'], required: true },
+          { name: 'password', label: 'Password (Required for new staff)', type: 'password', required: true, isNewOnly: true },
+          { name: 'phoneNumber', label: 'Phone Number', type: 'text', required: false },
+          { name: 'address', label: 'Address', type: 'text', required: false },
+          { name: 'dateOfHire', label: 'Date of Hire', type: 'date', required: false },
+          { name: 'salary', label: 'Salary', type: 'number', step: '0.01', required: false },
+        ]
+      },
+      'room-types': {
+        idKey: 'roomTypeID',
+        title: 'Room Type',
+        fields: [
+          { name: 'typeName', label: 'Type Name (e.g., Suite)', type: 'text', required: true },
+          { name: 'description', label: 'Description', type: 'textarea', required: true },
+          { name: 'basePrice', label: 'Base Price', type: 'number', step: '0.01', required: true },
+          { name: 'capacity', label: 'Capacity', type: 'number', required: true },
+        ]
+      },
+      'rooms': {
+        idKey: 'roomNumber',
+        title: 'Room Inventory',
+        fields: [
+          { name: 'roomNumber', label: 'Room Number (e.g. 101)', type: 'text', required: true, isNewOnly: true },
+          { name: 'roomTypeID', label: 'Room Type ID', type: 'number', required: true },
+          { name: 'floorNumber', label: 'Floor Number', type: 'number', required: true },
+          { name: 'currentStatus', label: 'Status', type: 'select', options: ['Available', 'Occupied', 'Maintenance'], required: true },
+        ]
+      },
+      'services': {
+        idKey: 'serviceID',
+        title: 'Service Catalog Item',
+        fields: [
+          { name: 'serviceName', label: 'Service Name', type: 'text', required: true },
+          { name: 'description', label: 'Description', type: 'textarea', required: false },
+          { name: 'unitPrice', label: 'Unit Price', type: 'number', step: '0.01', required: true },
+        ]
+      }
+    };
+
+    /** Navigation and View Switching */
+    function showView(viewId) {
+      views.forEach(view => {
+        view.classList.add('hidden');
+      });
+      const activeView = document.getElementById(`view-${viewId}`);
+      if (activeView) {
+        activeView.classList.remove('hidden');
+        const sectionTitle = activeView.querySelector('h2') ? activeView.querySelector('h2').textContent : viewId.replace(/-/g, ' ').toUpperCase();
+        mainTitle.textContent = sectionTitle;
+
+        if (viewId === 'staff-management') loadStaff();
+        if (viewId === 'room-type-config') loadRoomTypes();
+        if (viewId === 'room-inventory') loadRooms();
+        if (viewId === 'services-catalog') loadServices();
+        if (viewId === 'guest-billing') loadGuestBillingData(); // NEW CALL
+      }
+
+      navLinks.forEach(link => link.classList.remove('active-link'));
+      const currentLink = document.querySelector(`[data-view="${viewId}"]`);
+      if (currentLink) {
+        currentLink.classList.add('active-link');
+      }
+    }
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        showView(e.currentTarget.getAttribute('data-view'));
+      });
+    });
+
+    /** Message Handling */
+    function showStatus(message, isSuccess = true) {
+      statusMessage.textContent = message;
+      statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
+      if (isSuccess) {
+        statusMessage.classList.add('bg-green-100', 'text-green-800');
+      } else {
+        statusMessage.classList.add('bg-red-100', 'text-red-800');
+      }
+      setTimeout(() => {
+        statusMessage.classList.add('hidden');
+      }, 5000);
+    }
+
+    // --- Modal Control ---
+    function openModal() {
+      crudModal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal() {
+      crudModal.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+      crudForm.reset();
+    }
+
+    // --- Form Building Functions ---
+
+    function createInputField(field, value, isEdit, isPasswordChange = false) {
+      // Use 'let' for requiredAttr to allow for modification
+      let requiredAttr = field.required ? 'required' : '';
+      const type = field.type;
+      const step = field.step ? `step="${field.step}"` : '';
+
+      let inputHtml;
+      if (type === 'select') {
+        const optionsHtml = field.options.map(opt =>
+          `<option value="${opt}" ${value == opt ? 'selected' : ''}>${opt}</option>` // Use == for coercion
+        ).join('');
+        inputHtml = `<select id="${field.name}" name="${field.name}" ${requiredAttr} class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">${optionsHtml}</select>`;
+      } else if (type === 'textarea') {
+        inputHtml = `<textarea id="${field.name}" name="${field.name}" ${requiredAttr} class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">${value || ''}</textarea>`;
+      } else {
+        // Handle text, number, email, date, password
+        let valueAttr = value !== undefined ? `value="${value}"` : '';
+        let readonlyAttr = '';
+
+        // Prevent editing primary keys (like roomNumber)
+        if (isEdit && field.name === 'roomNumber') {
+          readonlyAttr = 'readonly';
+        }
+
+        // If this is the password change field, don't make it required automatically
+        if (isPasswordChange) {
+          requiredAttr = '';
+        }
+
+        // Set default for date fields
+        if (type === 'date' && !value && !isEdit) {
+          valueAttr = `value="${new Date().toISOString().split('T')[0]}"`;
+        }
+
+        inputHtml = `<input type="${type}" id="${field.name}" name="${field.name}" ${valueAttr} ${requiredAttr} ${step} ${readonlyAttr}
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 ${readonlyAttr ? 'bg-gray-100' : ''}">`;
+      }
+
+      // Only show '*' for fields required for ADD/POST, or explicitly required fields
+      const requiredDisplay = field.required && !isEdit && !isPasswordChange ? '<span class="text-red-500">*</span>' : '';
+
+      return `
+                <div>
+                    <label for="${field.name}" class="block text-sm font-medium text-gray-700 mb-1">
+                        ${field.label} ${requiredDisplay}
+                    </label>
+                    ${inputHtml}
+                </div>
+            `;
+    }
+
+
+    function buildForm(entityType, isEdit, recordData = {}) {
+      const config = ENTITY_CONFIG[entityType];
+      formFieldsContainer.innerHTML = '';
+      let formHTML = '';
+
+      config.fields.forEach(field => {
+        // Skip 'isNewOnly' fields (like password and roomNumber) if we are editing
+        if (isEdit && field.isNewOnly) {
+          return;
+        }
+
+        const value = recordData[field.name];
+        formHTML += createInputField(field, value, isEdit);
+      });
+
+      formFieldsContainer.innerHTML = formHTML;
+
+      // Special case for Staff: Add a separate section for Password change during edit
+      if (isEdit && entityType === 'staff') {
+        const passwordFieldConfig = { name: 'password', label: 'New Password', type: 'password', required: false, isNewOnly: false };
+
+        formFieldsContainer.innerHTML += `
+                        <div class="pt-4 border-t border-gray-200">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">Change Password (Optional)</h4>
+                            ${createInputField(passwordFieldConfig, '', true, true)}
+                        </div>
+                    `;
+      }
+    }
+
+    // --- CRUD Handlers ---
+
+    function handleAdd(entityType) {
+      modalTitle.textContent = `Add New ${ENTITY_CONFIG[entityType].title}`;
+      modalSubmitBtn.textContent = 'Add Record';
+      crudForm.dataset.mode = 'add';
+      document.getElementById('form-entity-type').value = entityType;
+      document.getElementById('form-record-id').value = '';
+
+      buildForm(entityType, false);
+      openModal();
+    }
+
+    async function handleEdit(entityType, recordID) {
+      const config = ENTITY_CONFIG[entityType];
+
+      try {
+        // Ensure the correct ID is used in the URL
+        const idForUrl = (entityType === 'rooms' && typeof recordID === 'string') ? recordID : recordID;
+
+        const url = `${BASE_URL}/${entityType}/${idForUrl}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Record not found or server error.');
+
+        // The previous error was likely here: trying to reassign a const variable inside the block.
+        // We've fixed this by using 'let' where values are changed.
+        const recordData = await response.json();
+
+        modalTitle.textContent = `Edit ${config.title} (ID: ${recordID})`;
+        modalSubmitBtn.textContent = 'Save Changes';
+        crudForm.dataset.mode = 'edit';
+        document.getElementById('form-entity-type').value = entityType;
+        document.getElementById('form-record-id').value = recordID;
+
+        buildForm(entityType, true, recordData);
+        openModal();
+      } catch (error) {
+        // Catching the JS error object now, not a constant variable
+        showStatus(`Failed to fetch record for editing: ${error.message}`, false);
+      }
+    }
+
+    async function handleDelete(entity, id, rowId) {
+      if (!confirm(`Are you sure you want to delete ${entity} with ID: ${id}? This action is permanent.`)) return;
+
+      try {
+        const deleteEndpoint = `${BASE_URL}/${entity}/${id}`;
+
+        const response = await fetch(deleteEndpoint, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          showStatus(`${entity} deleted successfully!`, true);
+          const row = document.getElementById(rowId);
+          if (row) row.remove();
+        } else {
+          const result = await response.json();
+          showStatus(`Deletion failed: ${result.error || 'Server error.'}`, false);
+        }
+      } catch (error) {
+        console.error(`Error deleting ${entity}:`, error);
+        showStatus(`Network Error: Could not connect to the server to delete ${entity}.`, false);
+      }
+    }
+
+
+    // --- Form Submission Logic ---
+    crudForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const entityType = document.getElementById('form-entity-type').value;
+      const recordID = document.getElementById('form-record-id').value;
+      const mode = crudForm.dataset.mode;
+
+      const formData = new FormData(crudForm);
+      const data = {};
+      formData.forEach((value, key) => {
+        // For Edit mode, only include fields that have a value
+        if (mode === 'edit' && (value === undefined || value === null || value === '')) return;
+
+        data[key] = value;
+      });
+
+      // Clean up special keys
+      delete data.entityType;
+      delete data.recordID;
+
+      // Determine method and URL
+      let method = 'POST';
+      let url = `${BASE_URL}/${entityType}`;
+
+      if (mode === 'edit') {
+        method = 'PUT';
+        // Rooms use roomNumber as the ID in the URL, others use ID key from config (recordID)
+        const idForUrl = (entityType === 'rooms') ? recordID : recordID;
+        url = `${BASE_URL}/${entityType}/${idForUrl}`;
+      }
+
+      modalSubmitBtn.textContent = 'Processing...';
+      modalSubmitBtn.disabled = true;
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: HEADERS,
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (response.ok || response.status === 200 || response.status === 201) {
+          showStatus(`${ENTITY_CONFIG[entityType].title} ${mode === 'add' ? 'added' : 'updated'} successfully!`, true);
+          closeModal();
+          // Reload the current view to show the new/updated data
+          showView(entityType);
+        } else {
+          showStatus(`${mode === 'add' ? 'Addition' : 'Update'} Failed: ${result.error || result.message || 'Unknown Server Error'}`, false);
+        }
+      } catch (error) {
+        showStatus(`Network Error: Could not connect to the server. Is the Flask API running?`, false);
+      } finally {
+        modalSubmitBtn.textContent = mode === 'add' ? 'Add Record' : 'Save Changes';
+        modalSubmitBtn.disabled = false;
+      }
+    });
+
+
+    // --- Data Loading Functions (CRUD GETs) ---
+
+    async function loadStaff() {
+      const tableBody = document.getElementById('staff-table-body');
+      tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Fetching staff list...</td></tr>';
+      try {
+        const response = await fetch(`${BASE_URL}/staff`);
+        const staff = await response.json();
+
+        tableBody.innerHTML = '';
+        if (staff.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No staff members found.</td></tr>';
+          return;
+        }
+
+        staff.forEach(member => {
+          const row = `
+                            <tr id="staff-${member.staffID}">
+                                <td class="px-6 py-4 whitespace-nowrap">${member.staffID}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${member.firstName} ${member.lastName}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${member.username}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${member.role === 'Admin' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800'}">
+                                        ${member.role}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button onclick="handleEdit('staff', ${member.staffID})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                                    <button onclick="handleDelete('staff', ${member.staffID}, 'staff-${member.staffID}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+          tableBody.innerHTML += row;
+        });
+      } catch (error) {
+        console.error('Error fetching staff:', error);
+        showStatus('Error: Could not connect to fetch staff data. Is Flask API running?', false);
+        tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error loading staff data.</td></tr>';
+      }
+    }
+
+    async function loadRoomTypes() {
+      const listContainer = document.getElementById('room-type-list');
+      listContainer.innerHTML = '<div class="bg-white p-6 rounded-xl shadow-lg text-center text-gray-500">Fetching room types...</div>';
+
+      try {
+        const response = await fetch(`${BASE_URL}/room-types`);
+        const types = await response.json();
+
+        listContainer.innerHTML = '';
+        if (types.length === 0) {
+          listContainer.innerHTML = '<div class="bg-white p-6 rounded-xl shadow-lg text-center text-gray-500">No room types configured.</div>';
+          return;
+        }
+
+        types.forEach(type => {
+          const rowID = `room-type-${type.roomTypeID}`;
+          const card = `
+                            <div id="${rowID}" class="bg-white p-5 rounded-xl shadow-lg border-l-4 border-indigo-500 flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-800">${type.typeName} (ID: ${type.roomTypeID})</h3>
+                                    <p class="text-gray-600 my-1">${type.description}</p>
+                                    <p class="text-sm text-gray-500">
+                                        Base Price: <span class="font-medium text-green-600">₹${type.basePrice}</span> | 
+                                        Capacity: ${type.capacity} Guests
+                                    </p>
+                                </div>
+                                <div class="space-x-2">
+                                    <button onclick="handleEdit('room-types', ${type.roomTypeID})" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                                    <button onclick="handleDelete('room-types', ${type.roomTypeID}, '${rowID}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                </div>
+                            </div>
+                        `;
+          listContainer.innerHTML += card;
+        });
+      } catch (error) {
+        console.error('Error fetching room types:', error);
+        showStatus('Error: Could not connect to fetch room types. Is Flask API running?', false);
+        listContainer.innerHTML = '<div class="bg-white p-6 rounded-xl shadow-lg text-center text-red-500">Error loading room types.</div>';
+      }
+    }
+
+    async function loadRooms() {
+      const tableBody = document.getElementById('rooms-table-body');
+      tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Fetching rooms...</td></tr>';
+
+      try {
+        const response = await fetch(`${BASE_URL}/rooms`);
+        const rooms = await response.json();
+
+        tableBody.innerHTML = '';
+        if (rooms.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No rooms in inventory.</td></tr>';
+          return;
+        }
+
+        rooms.forEach(room => {
+          const statusClass = room.currentStatus === 'Available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+          const rowID = `room-${room.roomNumber}`;
+          const row = `
+                            <tr id="${rowID}">
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${room.roomNumber}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${room.roomTypeID}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${room.floorNumber}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                                        ${room.currentStatus}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button onclick="handleEdit('rooms', '${room.roomNumber}')" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                                    <button onclick="handleDelete('rooms', '${room.roomNumber}', '${rowID}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+          tableBody.innerHTML += row;
+        });
+      } catch (error) {
+        console.error('Error fetching rooms:', error);
+        showStatus('Error: Could not connect to fetch room inventory. Is Flask API running?', false);
+        tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error loading room inventory.</td></tr>';
+      }
+    }
+
+    async function loadServices() {
+      const tableBody = document.getElementById('services-table-body');
+      tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Fetching services...</td></tr>';
+
+      try {
+        const response = await fetch(`${BASE_URL}/services`);
+        const services = await response.json();
+
+        tableBody.innerHTML = '';
+        if (services.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No services configured.</td></tr>';
+          return;
+        }
+
+        services.forEach(service => {
+          const rowID = `service-${service.serviceID}`;
+          const row = `
+                            <tr id="${rowID}">
+                                <td class="px-6 py-4 whitespace-nowrap">${service.serviceID}</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-medium">${service.serviceName}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-green-600 font-semibold">₹${service.unitPrice}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button onclick="handleEdit('services', ${service.serviceID})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                                    <button onclick="handleDelete('services', ${service.serviceID}, '${rowID}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+          tableBody.innerHTML += row;
+        });
+      } catch (error) {
+        console.error('Error fetching services:', error);
+        showStatus('Error: Could not connect to fetch services data. Is Flask API running?', false);
+        tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Error loading services data.</td></tr>';
+      }
+    }
+
+    /**
+     * MODIFIED FUNCTION: Load Guests, Reservations, Billing, and Payments with Correlation.
+     * Pivots on Reservations to ensure all guests are listed, using '—' for missing bill/payment data.
+     */
+    async function loadGuestBillingData() {
+      const unifiedTableBody = document.getElementById('unified-financial-table-body');
+
+      unifiedTableBody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">Fetching unified financial data...</td></tr>';
+
+      try {
+        // Fetch all necessary data
+        const [guestsResponse, billingResponse, paymentsResponse, reservationsResponse] = await Promise.all([
+          fetch(`${BASE_URL}/guests`),
+          fetch(`${BASE_URL}/billing`),
+          fetch(`${BASE_URL}/payments`),
+          fetch(`${BASE_URL}/reservations`)
+        ]);
+
+        const guests = await guestsResponse.json();
+        const billing = await billingResponse.json();
+        const payments = await paymentsResponse.json();
+        const reservations = await reservationsResponse.json();
+
+        // --- Create Lookup Maps ---
+        const guestMap = new Map(guests.map(g => [g.guestID, g]));
+        const billMap = new Map(billing.map(b => [b.reservationID, b])); // Map ReservationID to Bill
+
+        // Map Payments to their Reservation (via Bill)
+        const paymentsByBill = payments.reduce((acc, p) => {
+          const billId = p.billID;
+          if (!acc.has(billId)) {
+            acc.set(billId, []);
+          }
+          acc.get(billId).push(p);
+          return acc;
+        }, new Map());
+
+
+        let tableHTML = '';
+        if (reservations.length === 0) {
+          unifiedTableBody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">No reservation records found.</td></tr>';
+          return;
+        }
+
+        // Iterate over all reservations to ensure every guest is represented
+        reservations.forEach((res, resIndex) => {
+          const guest = guestMap.get(res.guestID) || { firstName: 'N/A', lastName: 'N/A' };
+          const guestName = `${guest.firstName} ${guest.lastName}`.trim() || 'N/A';
+          const roomInfo = `Res ID ${res.reservationID} / R${res.roomNumber}`;
+          const resStatus = res.reservationStatus;
+
+          const bill = billMap.get(res.reservationID);
+          const billPayments = bill ? paymentsByBill.get(bill.billID) || [] : [];
+
+          const billIDDisplay = bill ? bill.billID : '—';
+          const billTotalDisplay = bill ? `₹${parseFloat(bill.totalAmount).toFixed(2)}` : '—';
+          const billStatusDisplay = bill ? bill.paymentStatus : '—';
+          const statusClass = bill ? (bill.paymentStatus === 'Paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800') : 'bg-gray-100 text-gray-800';
+
+
+          // If there are payments, list each payment row by row
+          if (billPayments.length > 0) {
+            billPayments.forEach((payment, index) => {
+              // Only show Reservation/Bill details on the first row for that reservation
+              const resStartRow = index === 0;
+
+              const rowClass = resStartRow ? 'border-t border-indigo-200' : '';
+              const billIDCell = resStartRow ? `<td class="px-6 py-4 whitespace-nowrap font-medium text-indigo-700">${billIDDisplay}</td>` : '<td class="px-6 py-4 whitespace-nowrap text-gray-400">"</td>';
+              const guestNameCell = resStartRow ? `<td class="px-6 py-4 whitespace-nowrap">${guestName}</td>` : '<td class="px-6 py-4 whitespace-nowrap text-gray-400">"</td>';
+              const roomInfoCell = resStartRow ? `<td class="px-6 py-4 whitespace-nowrap text-sm">${roomInfo}</td>` : '<td class="px-6 py-4 whitespace-nowrap text-gray-400">"</td>';
+              const resStatusCell = resStartRow ? `<td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">${resStatus}</td>` : '<td class="px-6 py-4 whitespace-nowrap text-gray-400">"</td>';
+              const billTotalCell = resStartRow ? `<td class="px-6 py-4 whitespace-nowrap font-semibold text-red-600">${billTotalDisplay}</td>` : '<td class="px-6 py-4 whitespace-nowrap text-gray-400">"</td>';
+
+              const paymentAmount = payment.amountPaid ? parseFloat(payment.amountPaid).toFixed(2) : '0.00';
+
+              tableHTML += `
+                            <tr class="hover:bg-gray-50 ${rowClass}">
+                                ${billIDCell}
+                                ${guestNameCell}
+                                ${roomInfoCell}
+                                ${resStatusCell}
+                                ${billTotalCell}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">${payment.paymentMethod}</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-semibold text-green-600">₹${paymentAmount}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">${payment.paymentDate}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs">
+                                    ${resStartRow ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${billStatusDisplay}</span>` : '—'}
+                                </td>
+                            </tr>
+                        `;
+            });
+          } else {
+            // Scenario: Reservation exists, but NO bill or NO payment recorded (e.g., Active/Pending/Cancelled)
+            tableHTML += `
+                        <tr class="hover:bg-gray-50 border-t border-indigo-200">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-indigo-700">${billIDDisplay}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${guestName}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">${roomInfo}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">${resStatus}</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold text-red-600">${billTotalDisplay}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">—</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">₹0.00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">—</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs">
+                                ${bill ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${billStatusDisplay}</span>` : '—'}
+                            </td>
+                        </tr>
+                    `;
+          }
+        });
+
+        unifiedTableBody.innerHTML = tableHTML;
+
+      } catch (error) {
+        console.error('Error fetching guest/billing data:', error);
+        showStatus('Error: Could not connect to fetch guest/financial data. Is Flask API running?', false);
+        unifiedTableBody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-red-500">Error loading data.</td></tr>';
+      }
+    }
+
+
+    // Initial load on page entry
+    window.onload = () => {
+      showView('staff-management'); // Start with the first management view
+    };
+  </script>
+</body>
+
+</html>
